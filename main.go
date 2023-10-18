@@ -1,47 +1,45 @@
 package main
 
 import (
-	"fmt"
-
+	"github.com/gofiber/fiber/v2"
 	"github.com/kapeel-mopkar/priv-gorm/models"
 )
 
 func main() {
-	fmt.Println("List the privileges for each user")
-	ListPrivilegesForEachUser()
+	app := fiber.New()
 
-	fmt.Println("List the users for each privilege")
-	ListUsersForEachScopedPrivilege()
+	// Define your API routes
+	app.Get("/users", ListPrivilegesForEachUser)
+	app.Get("/privileges", ListUsersForEachScopedPrivilege)
+
+	// Listen on a port
+	app.Listen(":9093")
 }
 
-func ListPrivilegesForEachUser() {
+func ListPrivilegesForEachUser(c *fiber.Ctx) error {
 	var userModel models.UserModel
 	users, _ := userModel.FindAll()
+
+	// Prepare JSON response
+	response := make([]map[string]interface{}, 0)
 	for _, user := range users {
-		fmt.Println(user.ToString())
-		fmt.Println("Privileges: ", len(user.Privileges))
-		if len(user.Privileges) > 0 {
-			for _, privilege := range user.Privileges {
-				fmt.Println(privilege.ToString())
-				fmt.Println("========================")
-			}
-		}
-		fmt.Println("-----------------------------")
+		userData := user.ToJSON()
+		response = append(response, userData)
 	}
+
+	return c.JSON(response)
 }
 
-func ListUsersForEachScopedPrivilege() {
+func ListUsersForEachScopedPrivilege(c *fiber.Ctx) error {
 	var privilegeModel models.PrivilegeModel
 	privileges, _ := privilegeModel.FindAll()
+
+	// Prepare JSON response
+	response := make([]map[string]interface{}, 0)
 	for _, privilege := range privileges {
-		fmt.Println(privilege.ToString())
-		fmt.Println("Users: ", len(privilege.Users))
-		if len(privilege.Users) > 0 {
-			for _, user := range privilege.Users {
-				fmt.Println(user.ToString())
-				fmt.Println("========================")
-			}
-		}
-		fmt.Println("-----------------------------")
+		privilegeData := privilege.ToJSON()
+		response = append(response, privilegeData)
 	}
+
+	return c.JSON(response)
 }

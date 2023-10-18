@@ -1,16 +1,14 @@
 package config
 
 import (
-	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/mysql"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
 func GetDB() (*gorm.DB, error) {
-	dbDriver := "mysql"
-	dbName := "priv-gorm"
-	dbUser := "root"
-	dbPassword := "root"
-	db, err := gorm.Open(dbDriver, dbUser+":"+dbPassword+"@/"+dbName+"?charset=utf8&parseTime=True")
+	dsn := "host=127.0.0.1 user=postgres password=postgres%40123 dbname=test port=5455 sslmode=disable"
+
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		return nil, err
 	}

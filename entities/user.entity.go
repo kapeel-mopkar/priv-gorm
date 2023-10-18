@@ -1,7 +1,5 @@
 package entities
 
-import "fmt"
-
 type User struct {
 	Id         int `gorm:"primary_key, AUTO_INCREMENT"`
 	Email      string
@@ -9,10 +7,15 @@ type User struct {
 	Privileges []Privilege `gorm:"many2many:users_privileges"`
 }
 
-func (user *User) TableName() string {
-	return "users"
+func (user User) ToJSON() map[string]interface{} {
+	return map[string]interface{}{
+		"id":         user.Id,
+		"email":      user.Email,
+		"name":       user.Name,
+		"privileges": user.Privileges,
+	}
 }
 
-func (user User) ToString() string {
-	return fmt.Sprintf("id: %d\nemail: %s\nname: %s", user.Id, user.Email, user.Name)
+func (user *User) TableName() string {
+	return "users"
 }
